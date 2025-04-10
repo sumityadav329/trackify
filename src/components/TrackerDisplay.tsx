@@ -76,30 +76,27 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   };
 
   const generateReport = () => {
-    let report = `# ${tracker.title} Report\n\n`;
+    // CSV Header
+    let csv = "Step,Working,Not Started,Having Issues,Fixed,Ready\n";
+
     tracker.steps.forEach((step, index) => {
       const status = stepStatuses[index];
-      report += `## Step ${index + 1}: ${step}\n`;
       if (status) {
-        report += `- Working: ${status.working ? 'Yes' : 'No'}\n`;
-        report += `- Not Started: ${status.notStarted ? 'Yes' : 'No'}\n`;
-        report += `- Having Issues: ${status.havingIssues ? 'Yes' : 'No'}\n`;
-        report += `- Fixed: ${status.fixed ? 'Yes' : 'No'}\n`;
-        report += `- Ready: ${status.ready ? 'Yes' : 'No'}\n\n`;
+        csv += `"${step}",${status.working ? 'Yes' : 'No'},${status.notStarted ? 'Yes' : 'No'},${status.havingIssues ? 'Yes' : 'No'},${status.fixed ? 'Yes' : 'No'},${status.ready ? 'Yes' : 'No'}\n`;
       } else {
-        report += 'Status: Not available\n\n';
+        csv += `"${step}",Not available,Not available,Not available,Not available,Not available\n`;
       }
     });
-    return report;
+    return csv;
   };
 
   const downloadReport = () => {
     const report = generateReport();
-    const blob = new Blob([report], { type: 'text/plain' });
+    const blob = new Blob([report], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${tracker.title.replace(/\s+/g, '_').toLowerCase()}_report.txt`;
+    a.download = `${tracker.title.replace(/\s+/g, '_').toLowerCase()}_report.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
