@@ -66,6 +66,12 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+  		extend: {
+        spacing: {
+          '128': '32rem',
+          '144': '36rem',
+        },
+      },
   		keyframes: {
   			'accordion-down': {
   				from: {

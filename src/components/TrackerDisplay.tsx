@@ -105,15 +105,15 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
 
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>{tracker.title}</CardTitle>
+    <Card className="rounded-xl shadow-lg border-none">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-secondary rounded-t-xl">
+        <CardTitle className="text-2xl font-semibold">{tracker.title}</CardTitle>
         <Button variant="outline" size="sm" onClick={downloadReport}>
           <Download className="mr-2 h-4 w-4" />
           Download Report
         </Button>
       </CardHeader>
-      <CardDescription>Track your progress</CardDescription>
+      <CardDescription className="text-gray-500 mt-2 px-6">Track your progress with ease</CardDescription>
       <CardContent>
         <ol className="list-decimal pl-5 mb-4">
           {tracker.steps.map((step, index) => (
@@ -160,12 +160,12 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
           ))}
         </ol>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button onClick={prevStep} disabled={currentStep === 1}>
+      <CardFooter className="flex justify-between bg-secondary rounded-b-xl p-4">
+        <Button onClick={prevStep} disabled={currentStep === 1} className="px-4 py-2">
           <ArrowLeftCircle className="mr-2 h-4 w-4" />
           Previous
         </Button>
-        <Button onClick={nextStep} disabled={currentStep === tracker.steps.length}>
+        <Button onClick={nextStep} disabled={currentStep === tracker.steps.length} className="px-4 py-2">
           Next
         </Button>
       </CardFooter>

@@ -11,10 +11,12 @@ export default function Home() {
   });
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Trackify</h1>
-      <TrackerDefinition setTracker={setTracker} />
-      {tracker.steps.length > 0 && <TrackerDisplay tracker={tracker} />}
+    <div className="min-h-screen bg-gray-50 py-12 px-6 sm:px-12 lg:px-24">
+      <div className="container mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center">Trackify</h1>
+        <TrackerDefinition setTracker={setTracker} />
+        {tracker.steps.length > 0 && <TrackerDisplay tracker={tracker} />}
+      </div>
     </div>
   );
 }
