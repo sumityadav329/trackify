@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,14 +25,19 @@ type StepStatus = {
 
 const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const initialStepStatus: StepStatus[] = tracker.steps.map(() => ({
-    working: false,
-    notStarted: true,
-    havingIssues: false,
-    fixed: false,
-    ready: false,
-  }));
-  const [stepStatuses, setStepStatuses] = useState<StepStatus[]>(initialStepStatus);
+  const [stepStatuses, setStepStatuses] = useState<StepStatus[]>([]);
+
+  useEffect(() => {
+    // Initialize stepStatuses based on the tracker's steps
+    const initialStepStatus: StepStatus[] = tracker.steps.map(() => ({
+      working: false,
+      notStarted: true,
+      havingIssues: false,
+      fixed: false,
+      ready: false,
+    }));
+    setStepStatuses(initialStepStatus);
+  }, [tracker.steps]);
 
 
   const nextStep = () => {
@@ -50,7 +55,13 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   const handleStatusChange = (index: number, status: keyof StepStatus, checked: boolean) => {
     const newStepStatuses = [...stepStatuses];
     // Create a copy of the current status for the step
-    const newStatus = { ...newStepStatuses[index] };
+    const newStatus = { ...(newStepStatuses[index] || {
+      working: false,
+      notStarted: true,
+      havingIssues: false,
+      fixed: false,
+      ready: false,
+    }) };
 
     // Reset all statuses to false
     Object.keys(newStatus).forEach((key) => {
@@ -80,35 +91,35 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
               <div className="flex mt-2 space-x-2">
                 <label className="inline-flex items-center">
                   <Checkbox
-                    checked={stepStatuses[index].working}
+                    checked={stepStatuses[index]?.working || false}
                     onCheckedChange={(checked) => handleStatusChange(index, 'working', checked)}
                   />
                   <span className="ml-2">Working</span>
                 </label>
                 <label className="inline-flex items-center">
                   <Checkbox
-                    checked={stepStatuses[index].notStarted}
+                    checked={stepStatuses[index]?.notStarted || false}
                     onCheckedChange={(checked) => handleStatusChange(index, 'notStarted', checked)}
                   />
                   <span className="ml-2">Not Started</span>
                 </label>
                 <label className="inline-flex items-center">
                   <Checkbox
-                    checked={stepStatuses[index].havingIssues}
+                    checked={stepStatuses[index]?.havingIssues || false}
                     onCheckedChange={(checked) => handleStatusChange(index, 'havingIssues', checked)}
                   />
                   <span className="ml-2">Having Issues</span>
                 </label>
                 <label className="inline-flex items-center">
                   <Checkbox
-                    checked={stepStatuses[index].fixed}
+                    checked={stepStatuses[index]?.fixed || false}
                     onCheckedChange={(checked) => handleStatusChange(index, 'fixed', checked)}
                   />
                   <span className="ml-2">Fixed</span>
                 </label>
                 <label className="inline-flex items-center">
                   <Checkbox
-                    checked={stepStatuses[index].ready}
+                    checked={stepStatuses[index]?.ready || false}
                     onCheckedChange={(checked) => handleStatusChange(index, 'ready', checked)}
                   />
                   <span className="ml-2">Ready</span>
@@ -132,5 +143,3 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
 };
 
 export default TrackerDisplay;
-
-    
