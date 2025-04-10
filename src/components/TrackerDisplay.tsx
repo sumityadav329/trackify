@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { toast } from "@/hooks/use-toast";
-import { CheckCircle, ArrowLeftCircle, Loader2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
 
 interface TrackerDisplayProps {
   tracker: {
@@ -15,23 +15,9 @@ interface TrackerDisplayProps {
 
 const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [motivationalMessage, setMotivationalMessage] = useState('');
-
-  useEffect(() => {
-    generateMessage();
-  }, [currentStep, tracker]);
-
-  const generateMessage = () => {
-    const messages = [
-      "Keep going, you're doing great!",
-      "Every step counts, no matter how small.",
-      "You're making progress, don't give up now!",
-      "Believe in yourself, you can achieve anything!",
-      "Stay focused and keep pushing forward."
-    ];
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    setMotivationalMessage(messages[randomIndex]);
-  };
+  const [completedSteps, setCompletedSteps] = useState<boolean[]>(
+    Array(tracker.steps.length).fill(false)
+  );
 
   const nextStep = () => {
     if (currentStep < tracker.steps.length) {
@@ -45,6 +31,12 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
     }
   };
 
+  const handleStepComplete = (index: number, checked: boolean) => {
+    const newCompletedSteps = [...completedSteps];
+    newCompletedSteps[index] = checked;
+    setCompletedSteps(newCompletedSteps);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -56,11 +48,18 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
           {tracker.steps.map((step, index) => (
             <li key={index} className={index + 1 === currentStep ? 'font-semibold text-primary' : ''}>
               {step}
-              {index + 1 < currentStep && <CheckCircle className="inline-block ml-2 text-green-500" />}
+              <div className="flex mt-2">
+                <label className="inline-flex items-center mr-2">
+                  <Checkbox
+                    checked={completedSteps[index]}
+                    onCheckedChange={(checked) => handleStepComplete(index, checked)}
+                  />
+                  <span className="ml-2">Complete</span>
+                </label>
+              </div>
             </li>
           ))}
         </ol>
-          <p className="mb-4">{motivationalMessage}</p>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button onClick={prevStep} disabled={currentStep === 1}>
