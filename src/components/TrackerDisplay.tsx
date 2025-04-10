@@ -1,3 +1,4 @@
+'use client'
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -94,3 +95,4 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
 };
 
 export default TrackerDisplay;
+
