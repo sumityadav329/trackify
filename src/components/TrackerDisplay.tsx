@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { generateMotivationalMessage } from '@/ai/flows/generate-motivational-message';
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, ArrowLeftCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,32 +16,21 @@ interface TrackerDisplayProps {
 const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [motivationalMessage, setMotivationalMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     generateMessage();
   }, [currentStep, tracker]);
 
-  const generateMessage = async () => {
-    setIsLoading(true);
-    try {
-      const message = await generateMotivationalMessage({
-        trackerTitle: tracker.title,
-        currentStep: currentStep,
-        totalSteps: tracker.steps.length,
-      });
-      setMotivationalMessage(message.message);
-    } catch (error) {
-      toast({
-        title: "Error generating message",
-        description: "Failed to generate motivational message.",
-        variant: "destructive",
-      });
-      console.error("GenAI Error:", error);
-      setMotivationalMessage("Error generating message. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+  const generateMessage = () => {
+    const messages = [
+      "Keep going, you're doing great!",
+      "Every step counts, no matter how small.",
+      "You're making progress, don't give up now!",
+      "Believe in yourself, you can achieve anything!",
+      "Stay focused and keep pushing forward."
+    ];
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    setMotivationalMessage(messages[randomIndex]);
   };
 
   const nextStep = () => {
@@ -72,14 +60,7 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
             </li>
           ))}
         </ol>
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating message...
-          </div>
-        ) : (
           <p className="mb-4">{motivationalMessage}</p>
-        )}
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button onClick={prevStep} disabled={currentStep === 1}>
@@ -95,4 +76,3 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
 };
 
 export default TrackerDisplay;
-
