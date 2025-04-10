@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeftCircle } from 'lucide-react';
-import { ArrowRightCircle } from 'lucide-react';
+import { ArrowLeftCircle, ArrowRightCircle, Download } from 'lucide-react';
 
 
 interface TrackerDisplayProps {
@@ -76,13 +75,48 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
     setStepStatuses(newStepStatuses);
   };
 
+  const generateReport = () => {
+    let report = `# ${tracker.title} Report\n\n`;
+    tracker.steps.forEach((step, index) => {
+      const status = stepStatuses[index];
+      report += `## Step ${index + 1}: ${step}\n`;
+      if (status) {
+        report += `- Working: ${status.working ? 'Yes' : 'No'}\n`;
+        report += `- Not Started: ${status.notStarted ? 'Yes' : 'No'}\n`;
+        report += `- Having Issues: ${status.havingIssues ? 'Yes' : 'No'}\n`;
+        report += `- Fixed: ${status.fixed ? 'Yes' : 'No'}\n`;
+        report += `- Ready: ${status.ready ? 'Yes' : 'No'}\n\n`;
+      } else {
+        report += 'Status: Not available\n\n';
+      }
+    });
+    return report;
+  };
+
+  const downloadReport = () => {
+    const report = generateReport();
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${tracker.title.replace(/\s+/g, '_').toLowerCase()}_report.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>{tracker.title}</CardTitle>
-        <CardDescription>Track your progress</CardDescription>
+        <Button variant="outline" size="sm" onClick={downloadReport}>
+          <Download className="mr-2 h-4 w-4" />
+          Download Report
+        </Button>
       </CardHeader>
+      <CardDescription>Track your progress</CardDescription>
       <CardContent>
         <ol className="list-decimal pl-5 mb-4">
           {tracker.steps.map((step, index) => (
