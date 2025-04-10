@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
+import { ArrowLeftCircle } from 'lucide-react';
+import { ArrowRightCircle } from 'lucide-react';
+
 
 interface TrackerDisplayProps {
   tracker: {
@@ -13,11 +15,25 @@ interface TrackerDisplayProps {
   };
 }
 
+type StepStatus = {
+  working: boolean;
+  notStarted: boolean;
+  havingIssues: boolean;
+  fixed: boolean;
+  ready: boolean;
+};
+
 const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>(
-    Array(tracker.steps.length).fill(false)
-  );
+  const initialStepStatus: StepStatus[] = tracker.steps.map(() => ({
+    working: false,
+    notStarted: true,
+    havingIssues: false,
+    fixed: false,
+    ready: false,
+  }));
+  const [stepStatuses, setStepStatuses] = useState<StepStatus[]>(initialStepStatus);
+
 
   const nextStep = () => {
     if (currentStep < tracker.steps.length) {
@@ -31,11 +47,24 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
     }
   };
 
-  const handleStepComplete = (index: number, checked: boolean) => {
-    const newCompletedSteps = [...completedSteps];
-    newCompletedSteps[index] = checked;
-    setCompletedSteps(newCompletedSteps);
+  const handleStatusChange = (index: number, status: keyof StepStatus, checked: boolean) => {
+    const newStepStatuses = [...stepStatuses];
+    // Create a copy of the current status for the step
+    const newStatus = { ...newStepStatuses[index] };
+
+    // Reset all statuses to false
+    Object.keys(newStatus).forEach((key) => {
+      newStatus[key as keyof StepStatus] = false;
+    });
+
+    // Set the selected status to true
+    newStatus[status] = checked;
+
+    // Update the stepStatuses array with the new status
+    newStepStatuses[index] = newStatus;
+    setStepStatuses(newStepStatuses);
   };
+
 
   return (
     <Card>
@@ -48,13 +77,41 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
           {tracker.steps.map((step, index) => (
             <li key={index} className={index + 1 === currentStep ? 'font-semibold text-primary' : ''}>
               {step}
-              <div className="flex mt-2">
-                <label className="inline-flex items-center mr-2">
+              <div className="flex mt-2 space-x-2">
+                <label className="inline-flex items-center">
                   <Checkbox
-                    checked={completedSteps[index]}
-                    onCheckedChange={(checked) => handleStepComplete(index, checked)}
+                    checked={stepStatuses[index].working}
+                    onCheckedChange={(checked) => handleStatusChange(index, 'working', checked)}
                   />
-                  <span className="ml-2">Complete</span>
+                  <span className="ml-2">Working</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <Checkbox
+                    checked={stepStatuses[index].notStarted}
+                    onCheckedChange={(checked) => handleStatusChange(index, 'notStarted', checked)}
+                  />
+                  <span className="ml-2">Not Started</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <Checkbox
+                    checked={stepStatuses[index].havingIssues}
+                    onCheckedChange={(checked) => handleStatusChange(index, 'havingIssues', checked)}
+                  />
+                  <span className="ml-2">Having Issues</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <Checkbox
+                    checked={stepStatuses[index].fixed}
+                    onCheckedChange={(checked) => handleStatusChange(index, 'fixed', checked)}
+                  />
+                  <span className="ml-2">Fixed</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <Checkbox
+                    checked={stepStatuses[index].ready}
+                    onCheckedChange={(checked) => handleStatusChange(index, 'ready', checked)}
+                  />
+                  <span className="ml-2">Ready</span>
                 </label>
               </div>
             </li>
@@ -75,3 +132,5 @@ const TrackerDisplay: React.FC<TrackerDisplayProps> = ({ tracker }) => {
 };
 
 export default TrackerDisplay;
+
+    
